@@ -96,10 +96,6 @@
         >
           <div id="CartDrawer-CartItems" class="drawer__contents js-contents">
             {%- if cart != empty -%}
-              <section class="sc-offers" aria-labelledby="CartDrawer-OffersTitle">
-                <h2 id="CartDrawer-OffersTitle">{{ 'sections.cart.available_offers' | t }}</h2>
-                {%- render 'cart-promotion-progress', context: 'drawer' -%}
-              </section>
               <div class="drawer__cart-items-wrapper">
                 <table class="cart-items" role="table">
                   <thead role="rowgroup">

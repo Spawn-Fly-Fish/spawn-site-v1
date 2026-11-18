@@ -7,8 +7,9 @@
 {% endcomment %}
 
 {%- liquid
-  assign feather_skus = 'SPAWNWIDGEON-1,SPAWNPINTAIL-6,SPAWNWOODDUCK,SPAWNGADWALL-2,SPAWNGWT-4' | split: ','
-  assign shank_skus = 'SHNK-9-20,SHNKVRTY-60,SHNK-9-50,SHNK-20-50,SHNKVRTY-180,SHNK60-30-20,SHNK60-40-20,SHNK90-30-20,SHNK-15-50,SHNK-19-20,SHNK90-40-20,SHNK90-20-20,SHNK-18-20,SHNK-17-20' | split: ','
+  # Shanks (1371867250751) and feathers (1371867283519) 2-for-1 ended 2026-11-17; discounts deactivated.
+  assign feather_skus = '' | split: ','
+  assign shank_skus = '' | split: ','
   assign is_feather_offer = false
   assign is_shank_offer = false
   assign promotion_available = product.available

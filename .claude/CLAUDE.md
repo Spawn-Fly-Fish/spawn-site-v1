@@ -184,6 +184,7 @@ chore(snippets): migrate include to render in featured-collection
 3. Change theme code on a branch. Run the pre-commit checklist and verify an isolated preview.
 4. Open a pull request. Resolve conflicts on the PR branch and inspect the combined result.
 5. Follow the requester's authorization and GitHub review rules for the merge. Do not add a Caddis approval step. Verify the published theme's connected branch; a merge to that branch may publish through Shopify's native GitHub integration.
+6. Theme code changes ship only as a PR to the connected branch (`main`). Never duplicate the live theme in Shopify Admin and edit or publish the copy: a duplicate is not GitHub-connected, so publishing it breaks the sync. (Added 2026-11-18 after a Shopify-only session duplicated the theme to remove promo badges.)
 
 ## Self-Improvement Rule
 After any correction or mistake by Claude: append the fix as a new rule to this file so the same mistake never happens twice. Claude writes the rule itself at the end of the relevant section.
