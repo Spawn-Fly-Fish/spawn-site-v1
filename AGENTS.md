@@ -12,9 +12,11 @@ Read `.claude/CLAUDE.md` for theme architecture and coding rules. Read `.agents/
 
 Caddis MCP offers Shopify reads and specific staged actions. It is not a general Shopify Admin editor. Discover its tools before promising an Admin change. Only a write staged through Caddis needs Caddis approval. If no supported action exists, report that limit and use an authorized Shopify Admin workflow. Do not change theme code to imitate a product or inventory update.
 
-**Do not apply Caddis approval to theme work.** Reading or editing this repo, checking or previewing a development theme, committing, pushing a branch, opening a PR, resolving conflicts, and merging a PR do not use Caddis approval. Follow the requester's authorization and GitHub review rules for the PR and merge. A merge to the branch connected to the published theme may publish the change; check that branch and the reviewed result before merging. Do not invent an extra approval step because Caddis is installed.
+**Do not apply Caddis approval to theme work.** Reading or editing this repo, checking or previewing a development theme, committing, pushing a branch, opening a PR, resolving conflicts, and merging a PR do not use Caddis approval. Follow the requester's authorization and GitHub review rules for the PR. Only Engineering Lead merges, as stated under Theme workflow. Do not invent an extra approval step because Caddis is installed.
 
 ## Theme workflow
+
+**Merging to main publishes the live theme through Shopify's GitHub sync. Only Engineering Lead merges, at the exact gated commit after a CLEAN independent gate. Never CLI-push the live theme.**
 
 - Start from the current GitHub base in a clean checkout. Leave unrelated local edits alone.
 - Fetch Theme Editor changes from GitHub. Do not routinely run `shopify theme pull` into a working checkout. For sync recovery, pull a verified theme into a separate empty directory, compare it with GitHub, and bring intended changes through a PR.
@@ -22,11 +24,11 @@ Caddis MCP offers Shopify reads and specific staged actions. It is not a general
 - Resolve PR conflicts on that branch. Preserve both edits when possible. Ask the owner when the edits require different product choices.
 - Compare changed-file Theme Check results with the current baseline. Recommended theme check on this repository root exits 0 with 0 errors and 21 warnings. Record the warnings. A new error is a failure.
 - For a requested theme change, use an isolated development or unpublished theme for its Shopify-rendered preview. Never use the current published theme as a development or preview target.
-- Do not run `shopify theme push --allow-live` or upload files to the live theme during coding or review.
+- Never run `shopify theme push --allow-live`, `shopify theme publish`, or upload files to the live theme.
 - Ship theme code only as a PR to the connected branch. Do not duplicate the live theme in Shopify Admin to edit or publish a copy; a duplicate is not GitHub-connected and publishing it breaks the sync.
 - Do not overwrite `config/settings_data.json` or other editor-owned settings with stale local data. Inspect live editor changes before a planned settings edit.
 
-Luke selected Shopify's native GitHub integration for theme publishing. The live theme was imported into GitHub on September 26, 2026. Luke reported the integration setup complete on October 2, 2026. Verify the current published theme and connected branch in Shopify before a release. Shopify commits Theme Editor changes to that branch and syncs branch changes to the theme. GitHub Actions may run checks, but must not publish the theme. Caddis does not approve this GitHub workflow.
+Luke selected Shopify's native GitHub integration for theme publishing. The live theme was imported into GitHub on September 26, 2026. Luke reported the integration setup complete on October 2, 2026. The connected branch is `main`; verify the current published theme and connected branch in Shopify before a release. Shopify commits Theme Editor changes to that branch and syncs branch changes to the theme. GitHub Actions may run checks, such as the offline `.github/workflows/theme-check.yml`, but must not authenticate to a store or publish the theme. Caddis does not approve this GitHub workflow.
 
 ## Cloud Agent environment
 

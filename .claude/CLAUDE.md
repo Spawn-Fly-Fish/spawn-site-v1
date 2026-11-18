@@ -2,7 +2,9 @@
 
 Read `AGENTS.md` first. It owns the Shopify Admin versus theme-code routing and the current publishing boundary.
 
-Caddis approval applies only to writes staged through Caddis. Do not ask for Caddis approval to edit or test theme code, use a development preview, commit, push a branch, open or resolve a PR, or merge it. Follow the requester's authorization and GitHub rules for merges. Check the connected branch because merging it may publish the live theme.
+Caddis approval applies only to writes staged through Caddis. Do not ask for Caddis approval to edit or test theme code, use a development preview, commit, push a branch, open or resolve a PR, or merge it.
+
+**Merging to main publishes the live theme through Shopify's GitHub sync. Only Engineering Lead merges, at the exact gated commit after a CLEAN independent gate. Never CLI-push the live theme.**
 
 ## Project
 Fly fishing retailer (Ilwaco, WA). Dawn v15.2.0 base theme with custom header scroll behavior, free shipping bar, and in-store-only template. Store: spawn-fly-fish.myshopify.com. Check local Shopify CLI configuration on the current machine.
@@ -14,7 +16,7 @@ Open product-page work is tracked in `docs/pdp-improvement-backlog.md` — check
 shopify theme check  # repository root: 0 errors and 21 warnings; record any new error
 ```
 
-Use only an isolated development or unpublished theme for a Shopify-rendered preview. Verify the current published theme ID. Do not use that theme as a development target or push to it during coding and review.
+Use only an isolated development or unpublished theme for a Shopify-rendered preview. Verify the current published theme ID. Never use that theme as a development target or push to it.
 
 ## Architecture (OS2)
 - **JSON templates** (`templates/*.json`) — define page structure, reference sections. No Liquid here.
@@ -175,7 +177,7 @@ chore(snippets): migrate include to render in featured-collection
 - **Shopify's strict Liquid parser** — all Liquid must be syntactically valid or the theme will fail to publish. `shopify theme check` catches this.
 - **Theme IDs** — `129377796159` was live at the September 26, 2026 baseline import. Historical IDs `128853147711` and `128878903359` also exist in old instructions. Verify the current published theme and connected branch before a merge or other publishing operation.
 - **Shopify schema validation goes beyond theme check** — (1) `inline_richtext`/`richtext` settings cannot have `"default": ""`; omit that default. (2) Template JSON dynamic sources use an allowlist; `{{ product.type }}` is invalid in settings.
-- **Approved upload result** — if Luke separately authorizes a theme upload, confirm its output shows `errors: None`. A rejected file can leave the old version live.
+- **Preview upload result** — when pushing to an unpublished development theme, confirm the output shows `errors: None`. A rejected file can leave the old version on that theme. The live theme changes only through a merge to `main`.
 - **IntersectionObserver misses jump-scrolls** — an element jumping from below-viewport to above-viewport (End key, anchor link, fast flick) never intersects, so no callback fires. For scroll-position UI (sticky bars, scroll headers), use a rAF-throttled scroll listener with `getBoundingClientRect()` like `header-scroll.js` and `sticky-atc.js` do.
 
 ## Workflow
@@ -183,7 +185,7 @@ chore(snippets): migrate include to render in featured-collection
 2. Route Admin data changes through a supported Caddis action or another explicitly authorized Admin workflow.
 3. Change theme code on a branch. Run the pre-commit checklist and verify an isolated preview.
 4. Open a pull request. Resolve conflicts on the PR branch and inspect the combined result.
-5. Follow the requester's authorization and GitHub review rules for the merge. Do not add a Caddis approval step. Verify the published theme's connected branch; a merge to that branch may publish through Shopify's native GitHub integration.
+5. Only Engineering Lead merges, at the exact gated commit after a CLEAN independent gate; a merge to `main` publishes the live theme through Shopify's native GitHub integration. Do not add a Caddis approval step.
 6. Theme code changes ship only as a PR to the connected branch (`main`). Never duplicate the live theme in Shopify Admin and edit or publish the copy: a duplicate is not GitHub-connected, so publishing it breaks the sync. (Added 2026-11-18 after a Shopify-only session duplicated the theme to remove promo badges.)
 
 ## Self-Improvement Rule
