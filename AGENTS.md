@@ -23,6 +23,7 @@ Caddis MCP offers Shopify reads and specific staged actions. It is not a general
 - Compare changed-file Theme Check results with the current baseline. Recommended theme check on this repository root exits 0 with 0 errors and 21 warnings. Record the warnings. A new error is a failure.
 - For a requested theme change, use an isolated development or unpublished theme for its Shopify-rendered preview. Never use the current published theme as a development or preview target.
 - Do not run `shopify theme push --allow-live` or upload files to the live theme during coding or review.
+- Ship theme code only as a PR to the connected branch. Do not duplicate the live theme in Shopify Admin to edit or publish a copy; a duplicate is not GitHub-connected and publishing it breaks the sync.
 - Do not overwrite `config/settings_data.json` or other editor-owned settings with stale local data. Inspect live editor changes before a planned settings edit.
 
 Luke selected Shopify's native GitHub integration for theme publishing. The live theme was imported into GitHub on September 26, 2026. Luke reported the integration setup complete on October 2, 2026. Verify the current published theme and connected branch in Shopify before a release. Shopify commits Theme Editor changes to that branch and syncs branch changes to the theme. GitHub Actions may run checks, but must not publish the theme. Caddis does not approve this GitHub workflow.
