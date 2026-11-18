@@ -1,0 +1,46 @@
+# Offline Theme Check only. This workflow never authenticates to, pushes to, or
+# publishes a Shopify store: main is synced to the live theme by Shopify's
+# GitHub integration, so publishing happens only through a reviewed merge.
+name: Theme Check
+
+on:
+  pull_request:
+  push:
+    branches-ignore:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: theme-check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  theme-check:
+    name: theme-check
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      SHOPIFY_CLI_NO_ANALYTICS: "1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install Shopify CLI
+        run: npm install --global --no-audit --no-fund @shopify/cli@4.9.4
+
+      # An empty directory makes theme check exit 0 with no offenses.
+      - name: Refuse an empty theme root
+        run: |
+          test -f layout/theme.liquid
+          test -f locales/en.default.json
+
+      # Existing warnings are reported but only errors fail the job.
+      - name: Theme Check (fail on errors)
+        run: shopify theme check --path . --no-color --fail-level error
