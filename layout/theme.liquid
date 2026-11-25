@@ -1,5 +1,12 @@
 <!doctype html>
-<html class="js" lang="{{ request.locale.iso_code }}">
+<html
+  class="js"
+  lang="{{ request.locale.iso_code }}"
+  {% comment %}Promotion preview (?bfcm_preview=1) works only on non-live themes. See assets/promotion-schedule.js.{% endcomment %}
+  {% if theme.role != 'main' %}
+    data-promotion-preview-allowed
+  {% endif %}
+>
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">

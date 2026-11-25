@@ -36,6 +36,7 @@
       <a href="{{ routes.collections_url }}?view=rods-reels"{% if template.suffix == 'rods-reels' %} aria-current="page"{% endif %}>Rods &amp; reels</a>
       <a href="{{ collections['spawn-apparel'].url }}">Apparel</a>
       <a href="{{ blogs['spawn-blog'].url }}">Learn</a>
+      {%- render 'bfcm-2026', mode: 'nav' -%}
     </nav>
     <div class="sh-utilities">
       {% render 'header-search', input_id: 'Spawn-Home-Search' %}

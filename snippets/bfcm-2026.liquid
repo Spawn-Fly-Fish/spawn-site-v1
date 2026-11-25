@@ -1,0 +1,173 @@
+{% comment %}
+  Black Friday / Cyber Monday 2026 storefront display. Remove after the sale (see the PR teardown checklist).
+
+  Shopify automatic discounts "Black Friday 35% Off" and "Black Friday 20% Off" target the collections
+  bfcm-2026-35-off-spawn and bfcm-2026-20-off-fly-tying, which hold the products tagged bfcm-2026-spawn35
+  and bfcm-2026-tying20. Product pages and cards can't read automatic discounts, so this snippet works out
+  the display price from the same tags. Rounding matches Shopify: discount = round(price x rate / 100),
+  half up, in cents. B2B customers get catalog pricing, so they never see the sale state.
+
+  Window: 2026-11-27T08:00:00Z (Fri Nov 27, 12:00 AM PT) to 2026-12-04T07:59:59Z (Thu Dec 3, 11:59:59 PM PT).
+  Liquid renders the sale markup while now <= end (a coarse gate) with its best-guess state; the
+  <promotion-schedule> element (assets/promotion-schedule.js) then picks the state from the browser clock,
+  so cached pages switch at the exact minute. Outside the window only the regular markup shows.
+
+  Accepts:
+  - mode: {String} 'price' | 'badge' | 'cart' | 'nav' | 'drawer-nav'
+  - product: {Object} product (price and badge modes)
+  - amount: {Number} price in cents to show the sale price for (price mode)
+  - from: {Boolean} prefix the sale price with "From" (price mode)
+  - regular_html: {String} the surface's normal price markup, shown outside the window (price mode)
+  - style: {String} 'dawn' (default) | 'premium' | 'home' (price and badge modes)
+
+  Usage:
+  {% render 'bfcm-2026', mode: 'price', product: product, amount: price, regular_html: regular_price_html %}
+{% endcomment %}
+
+{%- liquid
+  assign bfcm_starts_at = '2026-11-27T08:00:00Z'
+  assign bfcm_ends_at = '2026-12-04T07:59:59Z'
+  assign bfcm_start = 1795766400
+  assign bfcm_end = 1796371199
+  assign bfcm_now = 'now' | date: '%s' | plus: 0
+
+  assign bfcm_open = false
+  assign bfcm_live = false
+  unless customer.b2b?
+    if bfcm_now <= bfcm_end
+      assign bfcm_open = true
+      if bfcm_now >= bfcm_start
+        assign bfcm_live = true
+      endif
+    endif
+  endunless
+
+  assign bfcm_rate = 0
+  if bfcm_open and product
+    if product.tags contains 'bfcm-2026-spawn35'
+      assign bfcm_rate = 35
+    elsif product.tags contains 'bfcm-2026-tying20'
+      assign bfcm_rate = 20
+    endif
+  endif
+
+  assign bfcm_page_url = pages['black-friday'].url | default: '/pages/black-friday'
+-%}
+
+{%- capture bfcm_schedule_attrs -%}
+  data-starts-at="{{ bfcm_starts_at }}" data-ends-at="{{ bfcm_ends_at }}"
+{%- endcapture -%}
+
+{%- case mode -%}
+  {%- when 'price' -%}
+    {%- if bfcm_rate > 0 and amount > 0 -%}
+      {%- liquid
+        assign bfcm_discount = amount | times: bfcm_rate | plus: 50 | divided_by: 100
+        assign bfcm_sale = amount | minus: bfcm_discount
+        if settings.currency_code_enabled
+          assign bfcm_was_money = amount | money_with_currency
+          assign bfcm_sale_money = bfcm_sale | money_with_currency
+        else
+          assign bfcm_was_money = amount | money
+          assign bfcm_sale_money = bfcm_sale | money
+        endif
+        if from
+          assign bfcm_sale_money = 'products.product.price.from_price_html' | t: price: bfcm_sale_money
+        endif
+        assign bfcm_tag = 'div'
+        if style == 'home'
+          assign bfcm_tag = 'span'
+        endif
+      -%}
+      <promotion-schedule class="bfcm-schedule" {{ bfcm_schedule_attrs }}>
+        <{{ bfcm_tag }} class="promotion-state" data-promotion-inactive{% if bfcm_live %} hidden{% endif %}>
+          {{- regular_html -}}
+        </{{ bfcm_tag }}>
+        <{{ bfcm_tag }} class="promotion-state" data-promotion-active{% unless bfcm_live %} hidden{% endunless %}>
+          {%- if style == 'home' -%}
+            <span class="bfcm-price__now">{{ bfcm_sale_money }}</span> <s>{{ bfcm_was_money }}</s>
+          {%- else -%}
+            {%- if style == 'premium' -%}<div class="price cp-card__price-inner price--bfcm"><div class="price__container">{%- endif -%}
+            <div class="bfcm-price">
+              <span class="visually-hidden visually-hidden--inline">{{ 'products.product.price.regular_price' | t }}</span>
+              <s class="price-item price-item--regular bfcm-price__was">{{ bfcm_was_money }}</s>
+              <span class="visually-hidden visually-hidden--inline">{{ 'products.product.price.sale_price' | t }}</span>
+              <span class="price-item price-item--sale price-item--last bfcm-price__now">{{ bfcm_sale_money }}</span>
+            </div>
+            {%- if style == 'premium' -%}</div></div>{%- endif -%}
+          {%- endif -%}
+        </{{ bfcm_tag }}>
+      </promotion-schedule>
+    {%- else -%}
+      {{- regular_html -}}
+    {%- endif -%}
+
+  {%- when 'badge' -%}
+    {%- if bfcm_rate > 0 and product.available -%}
+      <promotion-schedule class="bfcm-schedule" {{ bfcm_schedule_attrs }}>
+        {%- if style == 'home' -%}
+          <span class="sh-badge sh-badge--sale" data-promotion-active{% unless bfcm_live %} hidden{% endunless %}>
+            {{- bfcm_rate }}% OFF</span
+          >
+        {%- else -%}
+          <span
+            class="badge promotion-badge promotion-badge--bfcm color-{{ settings.sale_badge_color_scheme }}"
+            data-promotion-active
+            {% unless bfcm_live %}
+              hidden
+            {% endunless %}
+          >
+            {{- bfcm_rate }}% OFF</span
+          >
+        {%- endif -%}
+      </promotion-schedule>
+    {%- endif -%}
+
+  {%- when 'cart' -%}
+    {%- if bfcm_open and cart.item_count > 0 -%}
+      {%- liquid
+        assign bfcm_cart_has_35 = false
+        for item in cart.items
+          if item.product.tags contains 'bfcm-2026-spawn35'
+            assign bfcm_cart_has_35 = true
+            break
+          endif
+        endfor
+        assign bfcm_spawn_url = routes.collections_url | append: '/bfcm-2026-35-off-spawn'
+      -%}
+      <promotion-schedule class="bfcm-schedule" {{ bfcm_schedule_attrs }}>
+        <div class="bfcm-cart" data-promotion-active{% unless bfcm_live %} hidden{% endunless %}>
+          {%- if cart.total_discount > 0 -%}
+            <p class="bfcm-cart__savings">
+              You're saving {{ cart.total_discount | money }} with Black Friday pricing
+            </p>
+          {%- endif -%}
+          <p class="bfcm-cart__ends">Sale ends Thursday 12/3 at 11:59 PM PT</p>
+          {%- unless bfcm_cart_has_35 -%}
+            <p class="bfcm-cart__nudge">
+              <a href="{{ bfcm_spawn_url }}">
+                Spawn Dub, shanks and Super Select feathers are 35% off through Thursday.
+              </a>
+            </p>
+          {%- endunless -%}
+        </div>
+      </promotion-schedule>
+    {%- endif -%}
+
+  {%- when 'nav' -%}
+    {%- if bfcm_open -%}
+      <a href="{{ bfcm_page_url }}" class="sh-nav__sale"{% unless bfcm_live %} hidden{% endunless %}>
+        {%- comment -%}Shows its parent link only inside the window.{%- endcomment -%}
+        <promotion-schedule data-promotion-toggle="parent" {{ bfcm_schedule_attrs }}></promotion-schedule>
+        Black Friday Sale
+      </a>
+    {%- endif -%}
+
+  {%- when 'drawer-nav' -%}
+    {%- if bfcm_open -%}
+      <div class="drawer-menu__item drawer-menu__item--sale"{% unless bfcm_live %} hidden{% endunless %}>
+        <promotion-schedule data-promotion-toggle="parent" {{ bfcm_schedule_attrs }}></promotion-schedule>
+        <a href="{{ bfcm_page_url }}" class="drawer-menu__link">Black Friday Sale</a>
+      </div>
+    {%- endif -%}
+{%- endcase -%}

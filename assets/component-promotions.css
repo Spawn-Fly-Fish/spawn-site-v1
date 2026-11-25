@@ -128,3 +128,83 @@ promotion-schedule [hidden] {
     max-width: 70rem;
   }
 }
+
+/* Promotion states toggled by <promotion-schedule> (assets/promotion-schedule.js). */
+.promotion-state {
+  display: contents;
+}
+
+.promotion-state[hidden] {
+  display: none;
+}
+
+.promotion-badges--pdp:not(:has(.badge:not([hidden]))) {
+  display: none;
+}
+
+/* BFCM 2026 (snippets/bfcm-2026.liquid). Remove with the sale. */
+.bfcm-price__was {
+  color: rgba(var(--color-foreground), 0.75);
+  font-size: 1.3rem;
+  text-decoration: line-through;
+}
+
+.cp-card__price .bfcm-price__was {
+  font-size: inherit;
+}
+
+.bfcm-cart {
+  border-bottom: 0.1rem solid rgba(var(--color-foreground), 0.2);
+  margin: 0 0 1.6rem;
+  padding: 0 0 1.2rem;
+}
+
+.bfcm-cart p {
+  font-size: 1.3rem;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.bfcm-cart p + p {
+  margin-top: 0.4rem;
+}
+
+.bfcm-cart__savings {
+  font-weight: 600;
+}
+
+.bfcm-cart__ends,
+.bfcm-cart__nudge {
+  color: rgba(var(--color-foreground), 0.75);
+}
+
+.bfcm-cart__nudge a {
+  color: inherit;
+  text-underline-offset: 0.2rem;
+}
+
+.sh-masthead .sh-nav > a[hidden],
+.sh-masthead .drawer-menu__item[hidden] {
+  display: none;
+}
+
+.sh-masthead .sh-nav > a.sh-nav__sale {
+  font-weight: var(--sf-weight-bold, 700);
+  text-decoration: underline;
+  text-underline-offset: 5px;
+}
+
+/* Optional short announcement copy (announcement block "Mobile text"). */
+.announcement-bar__text--mobile {
+  display: none;
+}
+
+@media screen and (max-width: 989px) {
+  .announcement-bar__text--desktop {
+    display: none;
+  }
+
+  .announcement-bar__text--mobile {
+    display: inline;
+  }
+}

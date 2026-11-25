@@ -20,9 +20,20 @@
             "text": "FREE SHIPPING OVER $85",
             "link": "shopify://collections"
           }
+        },
+        "announcement-bar-bfcm-2026": {
+          "type": "announcement",
+          "settings": {
+            "text": "BLACK FRIDAY: 35% OFF SPAWN TYING · 20% OFF FLY TYING, BOXES & TOOLS · NO CODE NEEDED · ENDS 12/3",
+            "link": "/pages/black-friday",
+            "mobile_text": "BFCM: 35% off Spawn, 20% off tying. No code.",
+            "starts_at": "2026-11-27T08:00:00Z",
+            "ends_at": "2026-12-04T07:59:59Z"
+          }
         }
       },
       "block_order": [
+        "announcement-bar-bfcm-2026",
         "announcement-bar-0"
       ],
       "settings": {

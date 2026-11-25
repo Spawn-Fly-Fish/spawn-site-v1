@@ -479,6 +479,20 @@
             },
             "link": {
               "label": "リンク"
+            },
+            "mobile_text": {
+              "label": "Mobile text",
+              "info": "Optional shorter text shown on screens narrower than 990px."
+            },
+            "header_schedule": {
+              "content": "Schedule",
+              "info": "Optional. Show this announcement only between these UTC times, written like 2026-11-27T08:00:00Z. Fill in both. It is hidden before the start and removed after the end. Several scheduled announcements share the first one's times."
+            },
+            "starts_at": {
+              "label": "Show from (UTC)"
+            },
+            "ends_at": {
+              "label": "Show until (UTC)"
             }
           },
           "name": "告知"

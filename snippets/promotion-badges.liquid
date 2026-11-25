@@ -1,55 +1,11 @@
 {% comment %}
-  Renders variant-exact promotion badges for Shopify automatic discounts.
+  Renders promotion badges for Shopify automatic discounts on product cards and the product page.
+  Current promotion: Black Friday / Cyber Monday 2026 (snippets/bfcm-2026.liquid), Nov 27 to Dec 3 PT.
+  When a promotion ends, empty this snippet again; the card and PDP wrappers hide when it is empty.
 
   Accepts:
   - product: {Object} Product Liquid object
   - context: {String} "card" or "pdp"
 {% endcomment %}
 
-{%- liquid
-  # Shanks (1371867250751) and feathers (1371867283519) 2-for-1 ended 2026-11-17; discounts deactivated.
-  assign feather_skus = '' | split: ','
-  assign shank_skus = '' | split: ','
-  assign is_feather_offer = false
-  assign is_shank_offer = false
-  assign promotion_available = product.available
-
-  if context == 'card'
-    for variant in product.variants
-      if variant.available
-        if feather_skus contains variant.sku
-          assign is_feather_offer = true
-        endif
-        if shank_skus contains variant.sku
-          assign is_shank_offer = true
-        endif
-      endif
-    endfor
-  else
-    assign selected_variant = product.selected_or_first_available_variant
-    assign selected_sku = selected_variant.sku
-    assign promotion_available = selected_variant.available
-    if selected_variant.available
-      if feather_skus contains selected_sku
-        assign is_feather_offer = true
-      endif
-      if shank_skus contains selected_sku
-        assign is_shank_offer = true
-      endif
-    endif
-  endif
--%}
-
-{%- if promotion_available -%}
-  {%- if is_shank_offer -%}
-    <span class="badge promotion-badge color-{{ settings.sale_badge_color_scheme }}" data-discount-id="1371867250751">
-      {%- if context == 'card' -%}Select 2 for 1{%- else -%}Select mix shanks · buy 1, get 1 free{%- endif -%}
-    </span>
-  {%- endif -%}
-
-  {%- if is_feather_offer -%}
-    <span class="badge promotion-badge color-{{ settings.sale_badge_color_scheme }}" data-discount-id="1371867283519">
-      {%- if context == 'card' -%}Select 2 for 1{%- else -%}Select mix feathers · buy 1, get 1 free{%- endif -%}
-    </span>
-  {%- endif -%}
-{%- endif -%}
+{%- render 'bfcm-2026', mode: 'badge', product: product -%}
