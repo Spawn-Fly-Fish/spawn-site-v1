@@ -175,32 +175,31 @@ promotion-schedule [hidden] {
   padding: 0.6rem 1rem;
 }
 
-/* Cart drawer and cart page. */
-.bfcm-cart {
-  margin: 0 0 1.6rem;
-}
-
-.bfcm-cart p {
-  font-size: 1.3rem;
-  line-height: 1.4;
-  margin: 0;
-}
-
-.bfcm-cart > * + * {
-  margin-top: 0.8rem;
-}
-
-.bfcm-cart__savings {
-  font-weight: 600;
-}
-
-.bfcm-cart .bfcm-callout {
+/* Cart drawer and cart page: savings first, the end time smaller beneath. */
+.bfcm-cart.bfcm-callout {
   background: rgba(var(--color-foreground), 0.04);
   border: 0.1rem solid rgba(var(--color-foreground), 0.15);
   border-left: 0.4rem solid var(--sh-accent, rgb(var(--color-foreground)));
+  margin: 0 0 1.6rem;
+  padding: 0.9rem 1.2rem;
+}
+
+.bfcm-cart p {
+  margin: 0;
+}
+
+.bfcm-cart__savings {
   color: rgb(var(--color-foreground));
-  font-weight: 600;
-  padding: 0.8rem 1.2rem;
+  font-size: 1.4rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.bfcm-cart__ends {
+  color: rgba(var(--color-foreground), 0.75);
+  font-size: 1.2rem;
+  line-height: 1.4;
+  margin-top: 0.2rem;
 }
 
 @media screen and (min-width: 750px) {

@@ -126,16 +126,17 @@
     {%- endif -%}
 
   {%- when 'cart' -%}
-    {%- if bfcm_open and cart.item_count > 0 -%}
+    {%- comment -%}
+      One block: the customer's savings, then the end time. Shown only when the cart has a sale discount.
+      No links here: the cart keeps shoppers on the way to checkout.
+    {%- endcomment -%}
+    {%- if bfcm_open and cart.item_count > 0 and cart.total_discount > 0 -%}
       <promotion-schedule class="bfcm-schedule" {{ bfcm_schedule_attrs }}>
-        <div class="bfcm-cart" data-promotion-active{% unless bfcm_live %} hidden{% endunless %}>
-          {%- comment -%}No links here: the cart keeps shoppers on the way to checkout.{%- endcomment -%}
-          {%- if cart.total_discount > 0 -%}
-            <p class="bfcm-cart__savings">
-              You're saving {{ cart.total_discount | money }} with Black Friday pricing
-            </p>
-          {%- endif -%}
-          <p class="bfcm-callout">Ends Thu 12/3 at 11:59PM&nbsp;PT.</p>
+        <div class="bfcm-cart bfcm-callout" data-promotion-active{% unless bfcm_live %} hidden{% endunless %}>
+          <p class="bfcm-cart__savings">
+            You're saving {{ cart.total_discount | money }} with Black Friday pricing
+          </p>
+          <p class="bfcm-cart__ends">Ends Thu 12/3 at 11:59PM&nbsp;PT.</p>
         </div>
       </promotion-schedule>
     {%- endif -%}
