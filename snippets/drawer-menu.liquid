@@ -25,6 +25,12 @@
       <!-- Example: Using Shopify's navigation for "main-menu-2" with sub-menu items expanded -->
       <div class="drawer-menu__grid">
       {%- render 'bfcm-2026', mode: 'drawer-nav' -%}
+      {%- liquid
+        comment
+          BFCM 2026: top-level Fly Library and Learn items are hidden while the sale link shows (assets/component-promotions.css).
+        endcomment
+        assign bfcm_hide_urls = pages['fly-library'].url | append: '|' | append: blogs['spawn-blog'].url | split: '|'
+      -%}
       {% for link in menu.links %}
         {%- if rods_reels_landing and link.url == collections['fly-rods'].url -%}
           <div class="drawer-menu__item"><a href="{{ routes.collections_url }}?view=rods-reels" class="drawer-menu__link">Rods &amp; Reels</a></div>
@@ -32,7 +38,14 @@
         {%- elsif rods_reels_landing and link.url == collections['fly-reels'].url -%}
           {%- continue -%}
         {%- endif -%}
-        <div class="drawer-menu__item">
+        {%- liquid
+          assign bfcm_link_title = link.title | strip | downcase
+          assign bfcm_hide_class = ''
+          if bfcm_link_title == 'fly library' or bfcm_link_title == 'learn' or bfcm_hide_urls contains link.url
+            assign bfcm_hide_class = ' drawer-menu__item--bfcm-hide'
+          endif
+        -%}
+        <div class="drawer-menu__item{{ bfcm_hide_class }}">
           {% if link.links.size > 0 %}
             <button 
               class="drawer-menu__link"
@@ -62,7 +75,7 @@
           {% endif %}
         </div>
       {% endfor %}
-      <div class="drawer-menu__item"><a href="{{ blogs['spawn-blog'].url }}" class="drawer-menu__link">Learn</a></div>
+      <div class="drawer-menu__item drawer-menu__item--bfcm-hide"><a href="{{ blogs['spawn-blog'].url }}" class="drawer-menu__link">Learn</a></div>
       {%- if shop.customer_accounts_enabled -%}
         <div class="drawer-menu__item"><a href="{% if customer %}{{ routes.account_url }}{% else %}{{ routes.account_login_url }}{% endif %}" class="drawer-menu__link"{% unless customer %} rel="nofollow"{% endunless %}>{{ 'customer.account.title' | t }}</a></div>
       {%- endif -%}

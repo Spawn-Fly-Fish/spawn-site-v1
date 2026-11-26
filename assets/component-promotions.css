@@ -194,6 +194,23 @@ promotion-schedule [hidden] {
   text-underline-offset: 5px;
 }
 
+/* While the sale link shows (it carries the schedule's hidden state), hide Fly Library and Learn to make room. */
+.sh-masthead .sh-nav:has(> .sh-nav__sale:not([hidden])) > .sh-nav__bfcm-hide,
+.sh-masthead .drawer-menu__grid:has(> .drawer-menu__item--sale:not([hidden])) > .drawer-menu__item--bfcm-hide {
+  display: none;
+}
+
+/* "Black Friday" fits beside the centered logo from 1100px; the " Sale" suffix fits from 1440px. */
+.sh-nav__sale-suffix {
+  display: none;
+}
+
+@media screen and (min-width: 1440px) {
+  .sh-nav__sale-suffix {
+    display: inline;
+  }
+}
+
 /* Optional short announcement copy (announcement block "Mobile text"). */
 .announcement-bar__text--mobile {
   display: none;

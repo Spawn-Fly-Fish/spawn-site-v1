@@ -156,10 +156,13 @@
 
   {%- when 'nav' -%}
     {%- if bfcm_open -%}
-      <a href="{{ bfcm_page_url }}" class="sh-nav__sale"{% unless bfcm_live %} hidden{% endunless %}>
-        {%- comment -%}Shows its parent link only inside the window.{%- endcomment -%}
+      <a href="{{ bfcm_page_url }}" class="sh-nav__sale" aria-label="Black Friday Sale"{% unless bfcm_live %} hidden{% endunless %}>
+        {%- comment -%}
+          Shows its parent link only inside the window. While it shows, the header hides Fly Library and Learn
+          (.sh-nav__bfcm-hide); the " Sale" suffix shows only from 1440px, where it fits beside the logo.
+        {%- endcomment -%}
         <promotion-schedule data-promotion-toggle="parent" {{ bfcm_schedule_attrs }}></promotion-schedule>
-        Black Friday Sale
+        Black Friday<span class="sh-nav__sale-suffix" aria-hidden="true">&nbsp;Sale</span>
       </a>
     {%- endif -%}
 
