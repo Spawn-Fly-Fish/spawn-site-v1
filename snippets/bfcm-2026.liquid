@@ -107,14 +107,9 @@
   {%- when 'badge' -%}
     {%- if bfcm_rate > 0 and product.available -%}
       <promotion-schedule class="bfcm-schedule" {{ bfcm_schedule_attrs }}>
-        {%- comment -%}
-          Two-part sale tag: "Black Friday" + "35% off". The parts sit on one line when the card is wide
-          enough and stack as one block when it isn't (assets/component-promotions.css).
-        {%- endcomment -%}
         {%- if style == 'home' -%}
           <span class="sh-badge sh-badge--sale sh-badge--bfcm" data-promotion-active{% unless bfcm_live %} hidden{% endunless %}>
-            <span class="bfcm-tag__event">Black Friday</span>
-            <span class="bfcm-tag__offer">{{ bfcm_rate }}% off</span>
+            {{- 'BFCM ' | append: bfcm_rate | append: '% off' -}}
           </span>
         {%- else -%}
           <span
@@ -124,8 +119,7 @@
               hidden
             {% endunless %}
           >
-            <span class="bfcm-tag__event">Black Friday</span>
-            <span class="bfcm-tag__offer">{{ bfcm_rate }}% off</span>
+            {{- 'BFCM ' | append: bfcm_rate | append: '% off' -}}
           </span>
         {%- endif -%}
       </promotion-schedule>
@@ -133,41 +127,15 @@
 
   {%- when 'cart' -%}
     {%- if bfcm_open and cart.item_count > 0 -%}
-      {%- liquid
-        assign bfcm_cart_has_35 = false
-        for item in cart.items
-          if item.product.tags contains 'bfcm-2026-spawn35'
-            assign bfcm_cart_has_35 = true
-            break
-          endif
-        endfor
-        assign bfcm_spawn_url = routes.collections_url | append: '/bfcm-2026-35-off-spawn'
-      -%}
       <promotion-schedule class="bfcm-schedule" {{ bfcm_schedule_attrs }}>
         <div class="bfcm-cart" data-promotion-active{% unless bfcm_live %} hidden{% endunless %}>
+          {%- comment -%}No links here: the cart keeps shoppers on the way to checkout.{%- endcomment -%}
           {%- if cart.total_discount > 0 -%}
             <p class="bfcm-cart__savings">
               You're saving {{ cart.total_discount | money }} with Black Friday pricing
             </p>
           {%- endif -%}
-          <div class="bfcm-callout">
-            <div class="bfcm-callout__head">
-              <h2 class="bfcm-callout__title">Black Friday Sale</h2>
-              <a class="bfcm-callout__link" href="{{ bfcm_page_url }}">
-                Shop the sale<span aria-hidden="true">&nbsp;&rarr;</span>
-              </a>
-            </div>
-            <p class="bfcm-callout__text">
-              35% off Spawn tying, 20% off fly tying, boxes &amp; tools. Ends Thu 12/3 at 11:59&nbsp;PM&nbsp;PT.
-            </p>
-          </div>
-          {%- unless bfcm_cart_has_35 -%}
-            <p class="bfcm-cart__nudge">
-              <a href="{{ bfcm_spawn_url }}">
-                Spawn Dub, shanks and Super Select feathers are 35% off through Thursday.
-              </a>
-            </p>
-          {%- endunless -%}
+          <p class="bfcm-callout">Ends Thu 12/3 at 11:59PM&nbsp;PT.</p>
         </div>
       </promotion-schedule>
     {%- endif -%}
