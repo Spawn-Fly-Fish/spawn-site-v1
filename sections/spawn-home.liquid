@@ -10,6 +10,11 @@
   assign flies_id = section.id | append: '-flies'
 -%}
 <div class="sh-home">
+  {%- comment -%}
+    Optional schedule (hero_hidden_starts_at / hero_hidden_ends_at, UTC): the hero is replaced during that window,
+    e.g. by a scheduled image-banner above this section (BFCM 2026). Without a schedule it renders as before.
+  {%- endcomment -%}
+  {%- capture hero_html -%}
   <section class="sh-hero" aria-labelledby="SpawnHomeTitle">
     {%- if section.settings.hero_image -%}
       {{ section.settings.hero_image | image_url: width: 2400 | image_tag: class: 'sh-hero__image', widths: '550, 750, 1100, 1500, 2000, 2400', sizes: '100vw', loading: 'eager', fetchpriority: 'high', alt: hero_alt }}
@@ -29,6 +34,17 @@
       <a class="sh-hero__scroll" href="#SpawnCategories"><span>Explore the shop</span><span aria-hidden="true">↓</span></a>
     </div>
   </section>
+  {%- endcapture -%}
+  {%- if section.settings.hero_hidden_starts_at != blank or section.settings.hero_hidden_ends_at != blank -%}
+    {%- render 'promotion-swap',
+      starts_at: section.settings.hero_hidden_starts_at,
+      ends_at: section.settings.hero_hidden_ends_at,
+      active_html: '',
+      inactive_html: hero_html
+    -%}
+  {%- else -%}
+    {{- hero_html -}}
+  {%- endif -%}
 
   <section class="sh-section sh-shell" id="SpawnCategories" aria-labelledby="SpawnCategoriesTitle">
     <div class="sh-section-head"><div><p class="sh-eyebrow">Shop by category</p><h2 id="SpawnCategoriesTitle">From vise to water.</h2><p class="sh-category-intro">Stock the bench. Chase the next good day.</p></div></div>
@@ -115,6 +131,9 @@
     { "type": "text", "id": "hero_eyebrow", "label": "t:sections.spawn_home.eyebrow", "default": "SPAWN FLY FISH / ILWACO, WA" },
     { "type": "textarea", "id": "hero_title", "label": "t:sections.spawn_home.hero_title", "default": "TIED HERE.\nFISHED EVERYWHERE." },
     { "type": "textarea", "id": "hero_text", "label": "t:sections.spawn_home.hero_text", "default": "Original flies, proven materials, and a lifetime of looking forward to the next cast." },
+    { "type": "header", "content": "t:sections.spawn_home.hero_schedule.content", "info": "t:sections.spawn_home.hero_schedule.info" },
+    { "type": "text", "id": "hero_hidden_starts_at", "label": "t:sections.spawn_home.hero_hidden_starts_at" },
+    { "type": "text", "id": "hero_hidden_ends_at", "label": "t:sections.spawn_home.hero_hidden_ends_at" },
     { "type": "collection", "id": "tying_collection", "label": "t:sections.spawn_home.tying_collection" },
     { "type": "collection", "id": "materials_collection", "label": "t:sections.spawn_home.materials_collection" },
     { "type": "collection", "id": "flies_collection", "label": "t:sections.spawn_home.flies_collection" },

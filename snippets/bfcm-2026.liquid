@@ -11,6 +11,8 @@
   Liquid renders the sale markup while now <= end (a coarse gate) with its best-guess state; the
   <promotion-schedule> element (assets/promotion-schedule.js) then picks the state from the browser clock,
   so cached pages switch at the exact minute. Outside the window only the regular markup shows.
+  The homepage sale hero is a scheduled image-banner (templates/index.json bfcm_hero_2026) that replaces the
+  spawn-home hero for the same window (snippets/promotion-swap.liquid).
 
   Accepts:
   - mode: {String} 'price' | 'badge' | 'cart' | 'nav' | 'drawer-nav'
@@ -105,10 +107,15 @@
   {%- when 'badge' -%}
     {%- if bfcm_rate > 0 and product.available -%}
       <promotion-schedule class="bfcm-schedule" {{ bfcm_schedule_attrs }}>
+        {%- comment -%}
+          Two-part sale tag: "Black Friday" + "35% off". The parts sit on one line when the card is wide
+          enough and stack as one block when it isn't (assets/component-promotions.css).
+        {%- endcomment -%}
         {%- if style == 'home' -%}
-          <span class="sh-badge sh-badge--sale" data-promotion-active{% unless bfcm_live %} hidden{% endunless %}>
-            {{- bfcm_rate }}% OFF</span
-          >
+          <span class="sh-badge sh-badge--sale sh-badge--bfcm" data-promotion-active{% unless bfcm_live %} hidden{% endunless %}>
+            <span class="bfcm-tag__event">Black Friday</span>
+            <span class="bfcm-tag__offer">{{ bfcm_rate }}% off</span>
+          </span>
         {%- else -%}
           <span
             class="badge promotion-badge promotion-badge--bfcm color-{{ settings.sale_badge_color_scheme }}"
@@ -117,8 +124,9 @@
               hidden
             {% endunless %}
           >
-            {{- bfcm_rate }}% OFF</span
-          >
+            <span class="bfcm-tag__event">Black Friday</span>
+            <span class="bfcm-tag__offer">{{ bfcm_rate }}% off</span>
+          </span>
         {%- endif -%}
       </promotion-schedule>
     {%- endif -%}
@@ -142,7 +150,17 @@
               You're saving {{ cart.total_discount | money }} with Black Friday pricing
             </p>
           {%- endif -%}
-          <p class="bfcm-cart__ends">Sale ends Thursday 12/3 at 11:59 PM PT</p>
+          <div class="bfcm-callout">
+            <div class="bfcm-callout__head">
+              <h2 class="bfcm-callout__title">Black Friday Sale</h2>
+              <a class="bfcm-callout__link" href="{{ bfcm_page_url }}">
+                Shop the sale<span aria-hidden="true">&nbsp;&rarr;</span>
+              </a>
+            </div>
+            <p class="bfcm-callout__text">
+              35% off Spawn tying, 20% off fly tying, boxes &amp; tools. Ends Thu 12/3 at 11:59&nbsp;PM&nbsp;PT.
+            </p>
+          </div>
           {%- unless bfcm_cart_has_35 -%}
             <p class="bfcm-cart__nudge">
               <a href="{{ bfcm_spawn_url }}">
