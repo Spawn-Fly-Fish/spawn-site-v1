@@ -1,0 +1,15 @@
+{% comment %}
+  Renders an announcement block's text, with optional shorter copy below 990px.
+
+  Accepts:
+  - block: {Object} announcement block
+
+  Usage:
+  {% render 'announcement-bar-text', block: block %}
+{% endcomment %}
+{%- if block.settings.mobile_text != blank -%}
+  <span class="announcement-bar__text--desktop">{{ block.settings.text | escape }}</span>
+  <span class="announcement-bar__text--mobile">{{ block.settings.mobile_text | escape }}</span>
+{%- else -%}
+  {{ block.settings.text | escape }}
+{%- endif -%}

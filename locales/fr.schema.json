@@ -480,6 +480,20 @@
             },
             "link": {
               "label": "Lien"
+            },
+            "mobile_text": {
+              "label": "Mobile text",
+              "info": "Optional shorter text shown on screens narrower than 990px."
+            },
+            "header_schedule": {
+              "content": "Schedule",
+              "info": "Optional. Show this announcement only between these UTC times, written like 2026-11-27T08:00:00Z. Fill in both. It is hidden before the start and removed after the end. Several scheduled announcements share the first one's times."
+            },
+            "starts_at": {
+              "label": "Show from (UTC)"
+            },
+            "ends_at": {
+              "label": "Show until (UTC)"
             }
           }
         }
@@ -1132,6 +1146,16 @@
         },
         "mobile": {
           "content": "Mise en page sur mobile"
+        },
+        "header_schedule": {
+          "content": "Schedule",
+          "info": "Optional. Show this banner only between these UTC times, written like 2026-11-27T08:00:00Z. Fill in both. It is hidden before the start and removed after the end. Preview on an unpublished theme with ?bfcm_preview=1."
+        },
+        "starts_at": {
+          "label": "Show from (UTC)"
+        },
+        "ends_at": {
+          "label": "Show until (UTC)"
         }
       },
       "blocks": {
@@ -3584,7 +3608,13 @@
       "category_title": "Titre de la catégorie",
       "category_image": "Image de remplacement de la catégorie",
       "category_subtitle": "Sous-titre de la catégorie",
-      "category_cta": "Libellé du bouton de catégorie"
+      "category_cta": "Libellé du bouton de catégorie",
+      "hero_schedule": {
+        "content": "Hero schedule",
+        "info": "Optional. Hide the hero between these UTC times, written like 2026-11-27T08:00:00Z, for example while a scheduled banner above this section replaces it. Fill in both."
+      },
+      "hero_hidden_starts_at": "Hide hero from (UTC)",
+      "hero_hidden_ends_at": "Hide hero until (UTC)"
     },
     "wholesale_landing": {
       "name": "Page grossiste",

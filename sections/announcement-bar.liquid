@@ -12,6 +12,44 @@
   if section.blocks.size > 0
     assign announcement_bar = true
   endif
+
+  # Scheduled announcements, such as a sale banner. Times are UTC ISO 8601, e.g. 2026-11-27T08:00:00Z.
+  # A block needs both times; one with a missing or unreadable time never shows. B2B customers don't see them.
+  assign announcement_now = 'now' | date: '%s' | plus: 0
+  assign base_announcement_count = 0
+  assign base_announcement_first = null
+  assign scheduled_announcement_count = 0
+  assign scheduled_announcement_first = null
+  assign scheduled_announcement_ids = ''
+  assign scheduled_announcement_live = false
+  for announcement_block in section.blocks
+    if announcement_block.settings.starts_at == blank and announcement_block.settings.ends_at == blank
+      assign base_announcement_count = base_announcement_count | plus: 1
+      if base_announcement_first == null
+        assign base_announcement_first = announcement_block
+      endif
+      continue
+    endif
+    if customer.b2b?
+      continue
+    endif
+    assign block_start = announcement_block.settings.starts_at | date: '%s' | plus: 0
+    assign block_end = announcement_block.settings.ends_at | date: '%s' | plus: 0
+    if block_start == 0 or block_end == 0 or announcement_now > block_end
+      continue
+    endif
+    assign scheduled_announcement_count = scheduled_announcement_count | plus: 1
+    assign scheduled_announcement_ids = scheduled_announcement_ids | append: ',' | append: announcement_block.id | append: ','
+    # Several scheduled announcements share the first one's window.
+    if scheduled_announcement_first == null
+      assign scheduled_announcement_first = announcement_block
+      assign scheduled_announcement_starts_at = announcement_block.settings.starts_at
+      assign scheduled_announcement_ends_at = announcement_block.settings.ends_at
+      if announcement_now >= block_start
+        assign scheduled_announcement_live = true
+      endif
+    endif
+  endfor
   # customer.b2b? is nil when nobody is signed in. In Liquid, nil == false
   # is false, so a == false check hides the retail link from guests.
   assign show_retail_announcement_link = false
@@ -49,17 +87,40 @@
     {%- if section.settings.show_social and social_icons -%}
       {%- render 'social-icons' -%}
     {%- endif -%}
-    {%- if section.blocks.size == 1 -%}
+    {%- comment -%}
+      Scheduled announcements (starts_at / ends_at set) join the bar only inside their window. Liquid drops
+      them once they end. Until then the bar is rendered twice, without and with them, and <promotion-schedule>
+      (assets/promotion-schedule.js) shows the right one from the browser clock, so cached pages switch on
+      time. The variant that isn't current on the server is a <template>, so its slideshow starts only when shown.
+    {%- endcomment -%}
+    {%- liquid
+      assign announcement_variants = 'base' | split: ','
+      if scheduled_announcement_ids != blank
+        assign announcement_variants = 'base,scheduled' | split: ','
+      endif
+    -%}
+    {%- for announcement_variant in announcement_variants -%}
+    {%- liquid
+      assign announcement_count = base_announcement_count
+      assign announcement_first = base_announcement_first
+      if announcement_variant == 'scheduled'
+        assign announcement_count = base_announcement_count | plus: scheduled_announcement_count
+        assign announcement_first = base_announcement_first | default: scheduled_announcement_first
+      endif
+      assign announcement_slide_index = 0
+    -%}
+    {%- capture announcement_markup -%}
+    {%- if announcement_count == 1 -%}
       <div
         class="announcement-bar{% if section.settings.show_social %} announcement-bar--one-announcement{% endif %}"
         role="region"
         aria-label="{{ 'sections.header.announcement' | t }}"
         {{ block.shopify_attributes }}
       >
-        {%- if section.blocks.first.settings.text != blank -%}
-          {%- if section.blocks.first.settings.link != blank and show_retail_announcement_link -%}
+        {%- if announcement_first.settings.text != blank -%}
+          {%- if announcement_first.settings.link != blank and show_retail_announcement_link -%}
             <a
-              href="{{ section.blocks.first.settings.link }}"
+              href="{{ announcement_first.settings.link }}"
               class="announcement-bar__link link link--text focus-inset animate-arrow"
             >
           {%- endif -%}
@@ -68,19 +129,19 @@
               {%- if customer.b2b? -%}
                 Wholesale ordering · Catalog pricing for approved dealers
               {%- else -%}
-                {{ section.blocks.first.settings.text | escape }}
+                {%- render 'announcement-bar-text', block: announcement_first -%}
               {%- endif -%}
             </span>
-            {%- if section.blocks.first.settings.link != blank and show_retail_announcement_link -%}
+            {%- if announcement_first.settings.link != blank and show_retail_announcement_link -%}
               {{- 'icon-arrow.svg' | inline_asset_content -}}
             {%- endif -%}
           </p>
-          {%- if section.blocks.first.settings.link != blank and show_retail_announcement_link -%}
+          {%- if announcement_first.settings.link != blank and show_retail_announcement_link -%}
             </a>
           {%- endif -%}
         {%- endif -%}
       </div>
-    {%- elsif section.blocks.size > 1 -%}
+    {%- elsif announcement_count > 1 -%}
       <slideshow-component
         class="announcement-bar"
         role="region"
@@ -108,13 +169,25 @@
             data-speed="{{ section.settings.change_slides_speed }}"
           >
             {%- for block in section.blocks -%}
+              {%- liquid
+                if block.settings.starts_at != blank or block.settings.ends_at != blank
+                  assign announcement_block_key = ',' | append: block.id | append: ','
+                  if announcement_variant == 'base'
+                    continue
+                  endif
+                  unless scheduled_announcement_ids contains announcement_block_key
+                    continue
+                  endunless
+                endif
+                assign announcement_slide_index = announcement_slide_index | plus: 1
+              -%}
               <div
                 class="slideshow__slide slider__slide grid__item grid--1-col"
-                id="Slide-{{ section.id }}-{{ forloop.index }}"
+                id="Slide-{{ section.id }}-{{ announcement_slide_index }}"
                 {{ block.shopify_attributes }}
                 role="group"
                 aria-roledescription="{{ 'sections.announcements.announcement' | t }}"
-                aria-label="{{ forloop.index }} {{ 'general.slider.of' | t }} {{ forloop.length }}"
+                aria-label="{{ announcement_slide_index }} {{ 'general.slider.of' | t }} {{ announcement_count }}"
                 tabindex="-1"
               >
                 <div
@@ -135,7 +208,7 @@
                         {%- if customer.b2b? -%}
                           Wholesale ordering · Catalog pricing for approved dealers
                         {%- else -%}
-                          {{ block.settings.text | escape }}
+                          {%- render 'announcement-bar-text', block: block -%}
                         {%- endif -%}
                       </span>
                       {%- if block.settings.link != blank and show_retail_announcement_link -%}
@@ -172,6 +245,34 @@
           }
         </style>
       {%- endif -%}
+    {%- endif -%}
+    {%- endcapture -%}
+    {%- if announcement_variant == 'base' -%}
+      {%- assign base_announcement_markup = announcement_markup -%}
+    {%- else -%}
+      {%- assign scheduled_announcement_markup = announcement_markup -%}
+    {%- endif -%}
+    {%- endfor -%}
+    {%- if scheduled_announcement_ids == blank -%}
+      {{- base_announcement_markup -}}
+    {%- else -%}
+      <promotion-schedule
+        class="announcement-bar-schedule"
+        data-starts-at="{{ scheduled_announcement_starts_at | escape }}"
+        data-ends-at="{{ scheduled_announcement_ends_at | escape }}"
+      >
+        {%- if scheduled_announcement_live -%}
+          <div class="promotion-state" data-promotion-active>{{ scheduled_announcement_markup }}</div>
+          <template data-promotion-stamp="inactive">
+            <div class="promotion-state" data-promotion-inactive>{{ base_announcement_markup }}</div>
+          </template>
+        {%- else -%}
+          <div class="promotion-state" data-promotion-inactive>{{ base_announcement_markup }}</div>
+          <template data-promotion-stamp="active">
+            <div class="promotion-state" data-promotion-active>{{ scheduled_announcement_markup }}</div>
+          </template>
+        {%- endif -%}
+      </promotion-schedule>
     {%- endif -%}
     <div class="localization-wrapper">
       {%- if section.settings.enable_country_selector and localization.available_countries.size > 1 -%}
@@ -289,6 +390,29 @@
           "type": "url",
           "id": "link",
           "label": "t:sections.announcement-bar.blocks.announcement.settings.link.label"
+        },
+        {
+          "type": "text",
+          "id": "mobile_text",
+          "label": "t:sections.announcement-bar.blocks.announcement.settings.mobile_text.label",
+          "info": "t:sections.announcement-bar.blocks.announcement.settings.mobile_text.info"
+        },
+        {
+          "type": "header",
+          "content": "t:sections.announcement-bar.blocks.announcement.settings.header_schedule.content",
+          "info": "t:sections.announcement-bar.blocks.announcement.settings.header_schedule.info"
+        },
+        {
+          "type": "text",
+          "id": "starts_at",
+          "label": "t:sections.announcement-bar.blocks.announcement.settings.starts_at.label",
+          "placeholder": "2026-11-27T08:00:00Z"
+        },
+        {
+          "type": "text",
+          "id": "ends_at",
+          "label": "t:sections.announcement-bar.blocks.announcement.settings.ends_at.label",
+          "placeholder": "2026-12-04T07:59:59Z"
         }
       ]
     }

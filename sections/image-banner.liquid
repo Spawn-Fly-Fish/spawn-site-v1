@@ -1,3 +1,8 @@
+{%- comment -%}
+  Optional schedule (settings starts_at / ends_at, UTC): the banner shows only inside that window, through
+  snippets/promotion-swap.liquid. Used for the BFCM 2026 homepage hero. Without a schedule it renders as before.
+{%- endcomment -%}
+{%- capture image_banner_html -%}
 {{ 'section-image-banner.css' | asset_url | stylesheet_tag }}
 
 {%- liquid
@@ -202,6 +207,18 @@
     </div>
   </div>
 </div>
+{%- endcapture -%}
+
+{%- if section.settings.starts_at != blank or section.settings.ends_at != blank -%}
+  {%- render 'promotion-swap',
+    starts_at: section.settings.starts_at,
+    ends_at: section.settings.ends_at,
+    active_html: image_banner_html,
+    inactive_html: ''
+  -%}
+{%- else -%}
+  {{- image_banner_html -}}
+{%- endif -%}
 
 {% schema %}
 {
@@ -407,6 +424,21 @@
       "id": "show_text_below",
       "default": true,
       "label": "t:sections.image-banner.settings.show_text_below.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.image-banner.settings.header_schedule.content",
+      "info": "t:sections.image-banner.settings.header_schedule.info"
+    },
+    {
+      "type": "text",
+      "id": "starts_at",
+      "label": "t:sections.image-banner.settings.starts_at.label"
+    },
+    {
+      "type": "text",
+      "id": "ends_at",
+      "label": "t:sections.image-banner.settings.ends_at.label"
     }
   ],
   "blocks": [

@@ -271,7 +271,17 @@
                     {{ tile_image | image_url: width: 560 | image_tag: loading: 'eager', widths: '180, 280, 420, 560', sizes: '(min-width: 990px) 15vw, 30vw', alt: '' }}
                   </div>
                   <span class="collection-premium__hero-tile-title">{{ hero_product.title | escape }}</span>
-                  <span class="collection-premium__hero-tile-price">{% if hero_product.price_varies %}From {% endif %}{{ hero_product.price | money }}</span>
+                  {%- capture hero_tile_price_html -%}{% if hero_product.price_varies %}From {% endif %}{{ hero_product.price | money }}{%- endcapture -%}
+                  <span class="collection-premium__hero-tile-price">
+                    {%- render 'bfcm-2026',
+                      mode: 'price',
+                      product: hero_product,
+                      amount: hero_product.price,
+                      from: hero_product.price_varies,
+                      style: 'home',
+                      regular_html: hero_tile_price_html
+                    -%}
+                  </span>
                 </a>
               </li>
               {%- assign hero_tile_count = hero_tile_count | plus: 1 -%}

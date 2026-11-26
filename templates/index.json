@@ -9,6 +9,56 @@
  */
 {
   "sections": {
+    "bfcm_hero_2026": {
+      "type": "image-banner",
+      "blocks": {
+        "heading_bfcm": {
+          "type": "heading",
+          "settings": {
+            "heading": "Black Friday Sale",
+            "heading_size": "h1"
+          }
+        },
+        "text_bfcm": {
+          "type": "text",
+          "settings": {
+            "text": "35% off Spawn tying materials. 20% off fly tying, flies, boxes & tools. No code needed. Ends Thu 12/3.",
+            "text_style": "body"
+          }
+        },
+        "buttons_bfcm": {
+          "type": "buttons",
+          "settings": {
+            "button_label_1": "Shop the sale",
+            "button_link_1": "shopify://pages/black-friday",
+            "button_style_secondary_1": false,
+            "button_label_2": "",
+            "button_style_secondary_2": true
+          }
+        }
+      },
+      "block_order": [
+        "heading_bfcm",
+        "text_bfcm",
+        "buttons_bfcm"
+      ],
+      "settings": {
+        "image": "shopify://shop_images/DSC_0675_253a0b8c-4404-41ee-bd0e-3431911907e2.jpg",
+        "image_mobile": "shopify://shop_images/DSC_0675_253a0b8c-4404-41ee-bd0e-3431911907e2.jpg",
+        "image_overlay_opacity": 40,
+        "image_height": "large",
+        "desktop_content_position": "middle-left",
+        "show_text_box": false,
+        "desktop_content_alignment": "left",
+        "color_scheme": "scheme-4",
+        "image_behavior": "none",
+        "mobile_content_alignment": "left",
+        "stack_images_on_mobile": false,
+        "show_text_below": false,
+        "starts_at": "2026-11-27T08:00:00Z",
+        "ends_at": "2026-12-04T07:59:59Z"
+      }
+    },
     "premium_home": {
       "type": "spawn-home",
       "blocks": {
@@ -80,6 +130,8 @@
         "hero_eyebrow": "SPAWN FLY FISH / ILWACO, WA",
         "hero_title": "TIED HERE.\nFISHED EVERYWHERE.",
         "hero_text": "Original flies, proven materials, and a lifetime of looking forward to the next cast.",
+        "hero_hidden_starts_at": "2026-11-27T08:00:00Z",
+        "hero_hidden_ends_at": "2026-12-04T07:59:59Z",
         "tying_collection": "fly-tying-products",
         "materials_collection": "spawn-fly-fish-products",
         "flies_collection": "spawn-flies",
@@ -649,6 +701,7 @@
     }
   },
   "order": [
+    "bfcm_hero_2026",
     "premium_home",
     "image_banner",
     "collection_list_QGtX47",

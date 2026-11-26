@@ -1,0 +1,54 @@
+{% comment %}
+  Swaps a piece of markup for another during a dated promotion, such as the homepage sale hero.
+
+  Times are UTC ISO 8601, e.g. 2026-11-27T08:00:00Z. Without both readable times, once the window has
+  ended, or for B2B customers (catalog pricing, no retail sales), only inactive_html renders: the regular
+  markup, unchanged. Until the end, both render inside <promotion-schedule> (assets/promotion-schedule.js),
+  which shows the right one from the browser clock so cached pages switch on time. The state that isn't
+  current on the server is a <template>, so its images don't load until it is shown.
+  On a non-live theme, ?bfcm_preview=1 shows the active state before the start.
+
+  Accepts:
+  - starts_at: {String} window start (UTC)
+  - ends_at: {String} window end (UTC)
+  - active_html: {String} markup shown inside the window (may be empty)
+  - inactive_html: {String} markup shown outside it (may be empty)
+
+  Usage:
+  {% render 'promotion-swap', starts_at: start, ends_at: end, active_html: sale_html, inactive_html: regular_html %}
+{% endcomment %}
+
+{%- liquid
+  assign swap_now = 'now' | date: '%s' | plus: 0
+  assign swap_start = starts_at | date: '%s' | plus: 0
+  assign swap_end = ends_at | date: '%s' | plus: 0
+
+  assign swap_open = false
+  assign swap_live = false
+  unless customer.b2b?
+    if swap_start > 0 and swap_end > 0 and swap_now <= swap_end
+      assign swap_open = true
+      if swap_now >= swap_start
+        assign swap_live = true
+      endif
+    endif
+  endunless
+-%}
+
+{%- if swap_open -%}
+  <promotion-schedule data-starts-at="{{ starts_at | escape }}" data-ends-at="{{ ends_at | escape }}">
+    {%- if swap_live -%}
+      <div class="promotion-state" data-promotion-active>{{ active_html }}</div>
+      <template data-promotion-stamp="inactive">
+        <div class="promotion-state" data-promotion-inactive>{{ inactive_html }}</div>
+      </template>
+    {%- else -%}
+      <div class="promotion-state" data-promotion-inactive>{{ inactive_html }}</div>
+      <template data-promotion-stamp="active">
+        <div class="promotion-state" data-promotion-active>{{ active_html }}</div>
+      </template>
+    {%- endif -%}
+  </promotion-schedule>
+{%- else -%}
+  {{- inactive_html -}}
+{%- endif -%}

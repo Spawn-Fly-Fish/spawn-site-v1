@@ -129,6 +129,7 @@
             assign cp_compare_money = card_product.compare_at_price | money
           endif
         -%}
+        {%- capture cp_regular_price_html -%}
         <div class="price cp-card__price-inner{% if card_product.compare_at_price > card_product.price %} price--on-sale{% endif %}">
           <div class="price__container">
             {%- if card_product.compare_at_price > card_product.price -%}
@@ -145,6 +146,14 @@
             {%- endif -%}
           </div>
         </div>
+        {%- endcapture -%}
+        {%- render 'bfcm-2026',
+          mode: 'price',
+          product: card_product,
+          amount: cp_display_price,
+          style: 'premium',
+          regular_html: cp_regular_price_html
+        -%}
       </div>
 
       {%- if show_rating and card_product.metafields.reviews.rating.value != blank -%}
